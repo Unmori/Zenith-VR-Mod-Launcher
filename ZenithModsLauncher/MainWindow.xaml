@@ -1,0 +1,358 @@
+﻿<Window x:Class="ZenithModsLauncher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:toolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+        mc:Ignorable="d"
+        Title="Zenith Mods Launcher by Miinc and Unmori" Height="600" Width="810"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        UseLayoutRounding="True"
+        Icon="pack://application:,,,/ZenithModsLauncher;component/Resources/ZIcon.ico">
+    <Window.Resources>
+        <Style TargetType="Border" x:Key="MainPanel">
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Background" Value="WhiteSmoke" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10" Color="DimGray" ShadowDepth="0" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Border" x:Key="MessageParent">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Background" Value="#5999" />
+        </Style>
+        <Style TargetType="Border" x:Key="MessageBody" BasedOn="{StaticResource MainPanel}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Background" Value="#cfff" />
+        </Style>
+        <Style TargetType="Button" x:Key="TabButtonSelected" BasedOn="{StaticResource MaterialDesignFlatLightBgButton}" />
+        <Style TargetType="Button" x:Key="TabButtonUnselected" BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}" />
+    </Window.Resources>
+    <Grid Width="810" Height="600" MouseLeftButtonDown="Grid_MouseDragMove">
+        <Grid.Background>
+            <ImageBrush ImageSource="pack://application:,,,/ZenithModsLauncher;component/Resources/bg.jpeg" />
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="220" />
+        </Grid.RowDefinitions>
+        <Border Style="{DynamicResource MainPanel}" Background="#BFFFFFFF">
+            <Grid>
+                <TextBlock TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="16">
+                    <Run Text="Лаунчер модификаций" FontWeight="Light" FontFamily="Arial" />
+                    <Run Text="Zenith: The Last City" FontWeight="SemiBold" FontSize="16" FontFamily="Arial" />
+                    <Run Text="VR" FontWeight="Medium" FontSize="8"/>
+                </TextBlock>
+                <Button Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="8 0" Margin="0" x:Name="btnGetErrorLogs" Style="{DynamicResource MaterialDesignFlatDarkButton}" Foreground="#7F000000" FontStyle="Italic" FontSize="12" Content="Сообщить об ошибке" materialDesign:ButtonAssist.CornerRadius="10" Click="Button_GetErrorLogs" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <materialDesign:Badged x:Name="badgeChangeLogs" Grid.Row="4" VerticalAlignment="Center" Padding="0 0" Margin="0 0 6 0" Visibility="Collapsed">
+                        <Ellipse x:Name="elChangeLogs" Width="10" Height="10" VerticalAlignment="Center" Fill="#99FF8000" />
+                    </materialDesign:Badged>
+                    <Button x:Name="btnVersionInfo"
+                        Grid.Row="4"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Padding="8 0"
+                        Margin="0"
+                        Style="{DynamicResource MaterialDesignFlatDarkButton}"
+                        Background="#198000FF"
+                        materialDesign:ButtonAssist.CornerRadius="10"
+                        IsEnabled="False"
+                        Click="Button_ChangeLogs">
+                        <Button.Content>
+                            <TextBlock x:Name="tbVersionInfo"
+                                       Foreground="#B2000000"
+                                       FontStyle="Italic"
+                                       FontSize="12" />
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Border x:Name="brdModConfig" Grid.Row="1" Style="{DynamicResource MainPanel}" Background="#B23F305D" Margin="10 0" Visibility="Hidden" d:Visibility="Visible">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="48" />
+                </Grid.RowDefinitions>
+                <ListView x:Name="ModsListView"
+                          Padding="0"
+                          Margin="4"
+                          Style="{DynamicResource MaterialDesignListBox}"
+                          ScrollViewer.CanContentScroll="False"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          IsSynchronizedWithCurrentItem="True"
+                          SelectionChanged="ModsListView_SelectionChanged">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="LightGray" Padding="5" Margin="-5" BorderThickness="2" CornerRadius="10">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox Style="{DynamicResource MaterialDesignCheckBox}"
+                                              x:Name="CheckEnableMod"
+                                              IsEnabled="{Binding IsNotPersistent}"
+                                              IsChecked="{Binding IsEnabled, Mode=OneWay}"
+                                              Checked="CheckEnableMod_Checked"
+                                              Unchecked="CheckEnableMod_Checked"
+                                              HorizontalAlignment="Left"
+                                              Background="LightGray">
+                                        <CheckBox.Content>
+                                            <TextBlock FontWeight="Bold"
+                                                       FontSize="14"
+                                                       Foreground="White">
+                                                <Run Text="{Binding HumanName}" />
+                                                <Run Text="{Binding StringFormat= ({0}), Path=Name}" FontSize="10" Foreground="#aaa" FontWeight="UltraLight" />
+                                            </TextBlock>
+                                        </CheckBox.Content>
+                                    </CheckBox>
+                                    <TextBlock Text="{Binding Description}" Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" FontWeight="UltraLight" FontSize="12" Foreground="LightGray" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+                <ListView x:Name="ModsListSettingsView"
+                          Grid.Column="1"
+                          Margin="4"
+                          Style="{DynamicResource MaterialDesignListBox}"
+                          ScrollViewer.CanContentScroll="False"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          materialDesign:ListBoxItemAssist.ShowSelection="False">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="LightGray" Padding="2" Margin="-5" BorderThickness="2" CornerRadius="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition MinWidth="200" />
+                                        <ColumnDefinition MinWidth="40" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="{Binding Name}" Grid.Column="0" Grid.Row="0" Margin="2" TextWrapping="Wrap" FontSize="14" FontWeight="SemiBold" Foreground="LightGray" />
+                                    <TextBlock Text="{Binding HumanName}" Grid.Column="0" Grid.Row="1" Margin="2" TextWrapping="Wrap" FontSize="13" Foreground="LightGray" />
+                                    <TextBlock Text="{Binding Description}" Grid.Column="0" Grid.Row="2" Margin="2" TextWrapping="Wrap" FontWeight="UltraLight" FontSize="12" Foreground="LightGray" />
+                                    <Grid Grid.Column="1" Grid.RowSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <CheckBox x:Name="BoolSettingMod" Style="{DynamicResource MaterialDesignCheckBox}" HorizontalAlignment="Right" Margin="0 0 -20 0" Visibility="{Binding IsBoolValueVisible, TargetNullValue=false}" IsChecked="{Binding BoolValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="OnSettingChanged" Unchecked="OnSettingChanged" Background="LightGray" />
+                                        <TextBox x:Name="IntSettingMod" Margin="1" Style="{DynamicResource MaterialDesignDataGridTextColumnEditingStyle}" materialDesign:HintAssist.Hint="0 - 999999" Visibility="{Binding IsIntValueVisible, TargetNullValue=false}" Text="{Binding IntValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="OnSettingChanged" Foreground="LightGray">
+                                            <TextBox.Resources>
+                                                <Style TargetType="{x:Type materialDesign:SmartHint}">
+                                                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                                </Style>
+                                            </TextBox.Resources>
+                                        </TextBox>
+                                        <TextBox x:Name="StringSettingMod" Margin="1" Style="{DynamicResource MaterialDesignDataGridTextColumnEditingStyle}" materialDesign:HintAssist.Hint="Значение" Visibility="{Binding IsStringValueVisible, TargetNullValue=false}" Text="{Binding StringValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="OnSettingChanged" Foreground="LightGray" >
+                                            <TextBox.Resources>
+                                                <Style TargetType="{x:Type materialDesign:SmartHint}">
+                                                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                                </Style>
+                                            </TextBox.Resources>
+                                        </TextBox>
+                                        <toolkit:ColorPicker x:Name="ColorPickerSettingMod" Height="30" Width="50" BorderBrush="LightGray" BorderThickness="2" Visibility="{Binding IsColorValueVisible, TargetNullValue=false}" SelectedColor="{Binding ColorValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedColorChanged="OnSettingChanged" />
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+                <Button Grid.Column="1" Grid.Row="1" Margin="4" Content="Сохранить настройки" Click="Button_SaveConfigurationMods" />
+                <Button Grid.Row="1" Margin="4" Content="Сбросить настройки" Click="Button_ResetConfiguration" Background="Red" />
+            </Grid>
+        </Border>
+        <Border Grid.Row="2" Style="{DynamicResource MainPanel}" Background="#B2FFFFFF">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5*" />
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="3*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="160" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="OpenModsListButton" Grid.Column="1" Grid.ColumnSpan="2" Height="40" Margin="4" Click="Button_OpenModsList" Content="Список модификаций">
+                    <Button.ToolTip>
+                        <ToolTip HorizontalOffset="-350" VerticalOffset="-50" Background="#FFDEDEDE">
+                            <TextBlock Foreground="Black" Text="Список модификаций и их настройки будут доступны после установки" />
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+                <TextBlock Grid.Row="0" Grid.ColumnSpan="1" Margin="4" VerticalAlignment="Top" Style="{DynamicResource MaterialDesignTextBlock}" TextWrapping="Wrap" FontSize="14" >
+                    <Run Text="С помощью этого лаунчера вы сможете установить модификации на игру" />
+                    <Run Text="Zenith: The Last City." FontWeight="Bold" />
+                    <Run Text="Основной модификацией является"/>
+                    <Run Text="русификатор для игры." FontWeight="Bold" />
+                    <Run Text="Некоторая часть текста переводится средствами машинного перевода." />
+                </TextBlock>
+                <TextBox Grid.Row="1" x:Name="DirectoryPathBox" Margin="4 10" Style="{DynamicResource MaterialDesignDataGridTextColumnEditingStyle}" Background="LightGray" TextAlignment="Left" VerticalAlignment="Center" FontSize="14" Text="Нажмите для выбора корневого каталога игры Zenith VR" PreviewMouseLeftButtonUp="Button_ChooseFolder" IsReadOnly="True" />
+                <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="4" x:Name="btnSelectPath" Content="Выбор папки с игрой" Click="Button_ChooseFolder" />
+                <Button Grid.Row="2" Grid.Column="1" x:Name="btnUninstall" Margin="4" Content="Удалить" Click="Button_Uninstall" />
+                <Button Grid.Row="2" Grid.Column="2" x:Name="btnInstall" Margin="4" Content="Установить" Click="Button_Install" />
+                <Grid Grid.Row="2" Margin="5 0" RenderTransformOrigin="0.5,0.5">
+                    <ProgressBar x:Name="pbProgress" Minimum="0" Maximum="1" Margin="-1" Height="25" Style="{DynamicResource MaterialDesignLinearProgressBar}" Background="#B2D8D8D8" Foreground="#FF6E47CB" BorderThickness="0" />
+                    <TextBlock x:Name="tbProgressInfo" VerticalAlignment="Center" TextAlignment="Center" FontSize="16" Foreground="Black" />
+                </Grid>
+                <TextBlock Grid.Row="4" Margin="4" VerticalAlignment="Bottom" FontSize="14">
+                    <Run Text="by" />
+                    <Run Text="Miinc" FontWeight="SemiBold"/>
+                    <Run Text="&amp;" />
+                    <Run Text="Unmori" FontWeight="SemiBold"/>
+                </TextBlock>
+                <Button Grid.Row="4" x:Name="btnDonationCredits" Margin="4" Padding="8 0" HorizontalAlignment="Right" Content="Пожертвовать на еду" Click="Button_DonationCredits" />
+                <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="4" x:Name="CloseButton" Click="Button_Exit" Content="Выход" />
+            </Grid>
+        </Border>
+
+        <Border x:Name="brdChangeLogs" Grid.RowSpan="3" Style="{DynamicResource MessageParent}">
+            <Border Style="{DynamicResource MessageBody}" Height="500" Width="700">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="40" />
+                    </Grid.RowDefinitions>
+                    <TextBlock FontSize="18" FontWeight="Bold" Text="Список изменений" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <StackPanel Grid.Row="1" Orientation="Vertical" Margin="8">
+                        <StackPanel x:Name="spChangeLogsTabs" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Tag="0" Click="btnChangeLogsTab_Click" Content="Модификации" />
+                            <Button Tag="1" Click="btnChangeLogsTab_Click" Content="Лаунчер" Margin="10 0" />
+                        </StackPanel>
+                        <Grid MaxHeight="360">
+                            <ListView x:Name="lvChangeLogs"
+                                      ScrollViewer.CanContentScroll="False"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      materialDesign:ListBoxItemAssist.ShowSelection="False">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Margin="10 4 0 0" FontWeight="Bold" FontSize="14" Text="{Binding StringFormat=Версия {0}, Path=Version}" />
+                                            <ListView ItemsSource="{Binding Entries}" HorizontalAlignment="Stretch"
+                                                      materialDesign:ListBoxItemAssist.ShowSelection="False">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Margin="0" Padding="0" TextWrapping="WrapWithOverflow" Text="{Binding .}" />
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                                <ListView.Template>
+                                                    <ControlTemplate>
+                                                        <ItemsPresenter Margin="0" />
+                                                    </ControlTemplate>
+                                                </ListView.Template>
+                                                <ListView.ItemContainerStyle>
+                                                    <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                                                        <Setter Property="Padding" Value="0" />
+                                                    </Style>
+                                                </ListView.ItemContainerStyle>
+                                            </ListView>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="btnChangeLogsClose" MinWidth="100" Margin="8 0" Content="Закрыть" Click="btnCloseChangeLogs_Click" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Border>
+        <Border x:Name="brdInstallDirs" Grid.RowSpan="3" Style="{DynamicResource MessageParent}">
+            <Border Style="{DynamicResource MessageBody}" Height="500" Width="700">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="40" />
+                    </Grid.RowDefinitions>
+                    <TextBlock FontSize="18" FontWeight="Bold" Text="Выберите папку с игрой" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <StackPanel Grid.Row="1" Orientation="Vertical" Margin="8">
+                        <Grid Height="390">
+                            <ListView x:Name="lvDirectories"
+                                      ScrollViewer.CanContentScroll="False"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      materialDesign:ListBoxItemAssist.ShowSelection="False">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <RadioButton GroupName="InstallDirs" IsChecked="{Binding Mode=TwoWay, Path=IsSelected}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Viewbox Width="24" Margin="10 0">
+                                                        <Path Data="{Binding IconPath}" Fill="{Binding IconColor}" />
+                                                    </Viewbox>
+                                                    <TextBlock Text="{Binding Path}" Foreground="{Binding TextColor}" FontSize="14" FontWeight="Bold" />
+                                                </StackPanel>
+                                            </RadioButton>
+                                            <Button Style="{StaticResource MaterialDesignFlatButton}" VerticalAlignment="Center" HorizontalAlignment="Right" Content="-" FontSize="30" VerticalContentAlignment="Center" Padding="10 -10 10 0" Foreground="Red" Click="btnRemoveInstallPath_Click" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                            </ListView>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="+" FontSize="20" Padding="10 -5 10 0" Foreground="White" Background="Green" BorderBrush="Green" Click="btnAddInstallPath_Click" />
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="btnInstallDirsClose" MinWidth="100" Margin="8 0" Content="Закрыть" Click="btnInstallDirsClose_Click" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Border>
+
+        <Border x:Name="brdDialog" Grid.RowSpan="3" Style="{DynamicResource MessageParent}">
+            <Border Style="{DynamicResource MessageBody}" MaxHeight="500" Width="350">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="40" />
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="tblMboxTitle" Margin="4 2" FontSize="18" FontWeight="Bold" Text="Заголовок" />
+                    <TextBlock Grid.Row="1" x:Name="tblMboxText" Margin="8 8" TextWrapping="Wrap" FontSize="16" Text="Основной текст" />
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="btnMbox2" MinWidth="100" Margin="8 0" Content="Кнопка 2" Click="btnMbox2_Click" />
+                        <Button x:Name="btnMbox1" MinWidth="100" Margin="8 0" Content="Кнопка 1" Click="btnMbox1_Click" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Border>
+    </Grid>
+</Window>
