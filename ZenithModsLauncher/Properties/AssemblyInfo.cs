@@ -2,11 +2,11 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 
-[assembly: AssemblyTitle("ZenithModsLauncher")]
+[assembly: AssemblyTitle("Zenith VR Mod Launcher")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Miinc & Unmori")]
-[assembly: AssemblyProduct("ZenithModsLauncher v0.3.3")]
+[assembly: AssemblyProduct("ZenithModsLauncher v0.4")]
 [assembly: AssemblyCopyright("Copyright VTZenith © 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

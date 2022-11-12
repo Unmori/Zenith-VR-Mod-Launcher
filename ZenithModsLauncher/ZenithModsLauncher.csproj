@@ -8,7 +8,7 @@
     <ProjectGuid>{499C505A-C8D4-43B8-AFEE-C5C9AA8A21C4}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>ZenithModsLauncher</RootNamespace>
-    <AssemblyName>ZenithModsLauncher</AssemblyName>
+    <AssemblyName>Zenith-VR-Mod-Launcher</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -68,6 +68,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Resources\ZIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ZenithModsLauncher.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Costura, Version=5.7.0.0, Culture=neutral, processorArchitecture=MSIL">
